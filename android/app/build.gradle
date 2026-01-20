@@ -4,7 +4,7 @@ apply plugin: "com.facebook.react"
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 
 // background-geolocation
-Project background_geolocation = project(':react-native-background-geolocation')
+def background_geolocation = project(':react-native-background-geolocation')
 apply from: "${background_geolocation.projectDir}/app.gradle"
 
 /**
@@ -82,9 +82,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
     
-    namespace "io.fleetbase.navigator"
+    namespace "com.tribetayling.navigator"
     defaultConfig {
-        applicationId project.env.get("APP_IDENTIFIER")
+        applicationId "com.tribetayling.navigator"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode project.env.get("ANDROID_VERSION_CODE")?.toInteger() ?: 1
@@ -93,7 +93,7 @@ android {
         manifestPlaceholders = [
             appLinkScheme: project.env.get("APP_LINK_PREFIX") ?: "flbnavigator"
         ]
-        resValue "string", "build_config_package", "io.fleetbase.navigator"
+        resValue "string", "build_config_package", "com.tribetayling.navigator"
     }
     signingConfigs {
         release {

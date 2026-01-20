@@ -1,4 +1,10 @@
 {
-    "name": "NavigatorApp",
-    "displayName": "NavigatorApp"
+  "name": "SmannNavigator",
+  "displayName": "Smann Navigator",
+  "android": {
+    "package": "com.tribetayling.navigator"
+  },
+  "ios": {
+    "bundleIdentifier": "com.tribetayling.navigator.ios"
+  }
 }

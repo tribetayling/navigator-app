@@ -1,17 +1,15 @@
-import Config from 'react-native-config';
-import { Platform, ActionSheetIOS, Alert, Dimensions } from 'react-native';
+import ImageResizer from '@bam.tech/react-native-image-resizer';
 import { Collection, lookup } from '@fleetbase/sdk';
-import storage, { getString } from './storage';
-import { capitalize } from './format';
-import { themes } from '../../tamagui.config';
-import { APP_THEME_KEY } from '../hooks/use-app-theme';
-import { pluralize } from 'inflected';
 import { countries } from 'countries-list';
 import { parseISO } from 'date-fns';
+import { ActionSheetIOS, Alert, Dimensions, Platform } from 'react-native';
+import Config from 'react-native-config';
 import NavigatorConfig from '../../navigator.config';
-import ImageResizer from '@bam.tech/react-native-image-resizer';
+import { themes } from '../../tamagui.config';
+import { APP_THEME_KEY } from '../hooks/use-app-theme';
+import storage, { getString } from './storage';
 
-export async function resizePhoto(uri: string, maxSize = 1024): Promise<string> {
+export async function resizePhoto(uri, maxSize = 1024) {
     const MAX_DIMENSION = maxSize;
 
     const { width, height } = Dimensions.get('window');
@@ -171,6 +169,11 @@ export function invokeAndGet(callable, path, defaultValue = null) {
 }
 
 export function config(key, defaultValue) {
+    // Handle case where Config module is null or undefined
+    if (!Config || typeof Config !== 'object') {
+        console.warn(`[config] react-native-config is not properly initialized, returning default value for key: ${key}`);
+        return defaultValue;
+    }
     return get(Config, key, defaultValue);
 }
 

@@ -1,5 +1,9 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">NavigatorApp</string>
-    <string name="facebook_app_id" tools:ignore="ResourceCycle">@string/facebook_app_id</string>
-    <string name="facebook_client_token" tools:ignore="ResourceCycle">@string/facebook_client_token</string>
+<resources>    
+	<string name="app_name">Smann Navigator</string>
+	<string name="facebook_app_id">12345</string>
+	<string name="facebook_client_token">abc</string>
+	<string name="FACEBOOK_APP_ID">12345</string>
+	<string name="FACEBOOK_CLIENT_TOKEN">abc</string>
+	<string name="GOOGLE_MAPS_API_KEY">AIza</string>
+	<string name="TRANSISTORSOFT_LICENSE_KEY">your-license-key-here</string>
 </resources>

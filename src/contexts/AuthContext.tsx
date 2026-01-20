@@ -1,17 +1,18 @@
-import React, { createContext, useContext, useReducer, useMemo, useEffect, useCallback, useRef } from 'react';
+import { Driver } from '@fleetbase/sdk';
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
 import { Platform } from 'react-native';
 import { EventRegister } from 'react-native-event-listeners';
-import { Driver } from '@fleetbase/sdk';
-import { later, isArray, navigatorConfig } from '../utils';
-import useStorage, { storage } from '../hooks/use-storage';
+import { LoginManager as FacebookLoginManager } from 'react-native-fbsdk-next';
 import useFleetbase from '../hooks/use-fleetbase';
+import useStorage, { storage } from '../hooks/use-storage';
+import { later, navigatorConfig } from '../utils';
+import { useConfig } from './ConfigContext';
 import { useLanguage } from './LanguageContext';
 import { useNotification } from './NotificationContext';
-import { LoginManager as FacebookLoginManager } from 'react-native-fbsdk-next';
 
-const AuthContext = createContext();
+const AuthContext = createContext<any>({});
 
-const authReducer = (state, action) => {
+const authReducer = (state: any, action: any) => {
     switch (action.type) {
         case 'RESTORE_SESSION':
             return { ...state, driver: action.driver };
@@ -32,13 +33,14 @@ const authReducer = (state, action) => {
     }
 };
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }: { children: any }) => {
     const { fleetbase, adapter } = useFleetbase();
     const { setLocale } = useLanguage();
-    const { deviceToken } = useNotification();
-    const [storedDriver, setStoredDriver] = useStorage('driver');
-    const [organizations, setOrganizations] = useStorage('organizations', []);
-    const [authToken, setAuthToken] = useStorage('_driver_token');
+    const { deviceToken } = useNotification() as any;
+    const { resolveConnectionConfig } = useConfig();
+    const [storedDriver, setStoredDriver] = useStorage('driver', null) as [any, any];
+    const [organizations, setOrganizations] = useStorage('organizations', []) as [any[], any];
+    const [authToken, setAuthToken] = useStorage('_driver_token', null) as unknown as [string, any];
     const [state, dispatch] = useReducer(authReducer, {
         isSendingCode: false,
         isVerifyingCode: false,
@@ -50,6 +52,9 @@ export const AuthProvider = ({ children }) => {
     });
     const organizationsLoadedRef = useRef(false);
     const loadOrganizationsPromiseRef = useRef();
+    const BACKEND_URL = resolveConnectionConfig('BACKEND_URL', 'http://localhost:4000');
+    const FLEETBASE_HOST = resolveConnectionConfig('FLEETBASE_HOST');
+    const FLEETBASE_KEY = resolveConnectionConfig('FLEETBASE_KEY');
 
     // Restore session on app load
     useEffect(() => {
@@ -69,7 +74,7 @@ export const AuthProvider = ({ children }) => {
     }, [storedDriver, fleetbase]);
 
     const setDriver = useCallback(
-        (newDriver) => {
+        (newDriver: any) => {
             if (!newDriver) {
                 setStoredDriver(null);
                 EventRegister.emit('driver.updated', null);
@@ -91,7 +96,7 @@ export const AuthProvider = ({ children }) => {
 
     // Track driver location
     const trackDriverLocation = useCallback(
-        async (location) => {
+        async (location: any) => {
             try {
                 const driver = await state.driver.update({ place: location.id });
                 setDriver(driver);
@@ -104,7 +109,7 @@ export const AuthProvider = ({ children }) => {
 
     // Reload the driver resource
     const reloadDriver = useCallback(
-        async (data = {}) => {
+        async (data: any = {}) => {
             try {
                 const driver = await state.driver.reload();
                 setDriver(driver);
@@ -117,7 +122,7 @@ export const AuthProvider = ({ children }) => {
 
     // Track driver position and other position related data
     const trackDriver = useCallback(
-        async (data = {}) => {
+        async (data: any = {}) => {
             try {
                 const driver = await state.driver.track(data);
                 setDriver(driver);
@@ -130,7 +135,7 @@ export const AuthProvider = ({ children }) => {
 
     // Update driver meta attributes
     const updateDriverMeta = useCallback(
-        async (newMeta = {}) => {
+        async (newMeta: any = {}) => {
             const meta = { ...state.driver.getAttribute('meta'), ...newMeta };
             try {
                 const driver = await state.driver.update({ meta });
@@ -145,7 +150,7 @@ export const AuthProvider = ({ children }) => {
 
     // Update driver meta attributes
     const updateDriver = useCallback(
-        async (data = {}) => {
+        async (data: any = {}) => {
             try {
                 dispatch({ type: 'START_UPDATE', driver: state.driver, isUpdating: true });
                 const driver = await state.driver.update({ ...data });
@@ -162,7 +167,7 @@ export const AuthProvider = ({ children }) => {
 
     // Toggle driver online status
     const toggleOnline = useCallback(
-        async (online = null) => {
+        async (online: boolean | null = null) => {
             if (!adapter) return;
 
             online = online === null ? !state.driver.isOnline : online;
@@ -180,7 +185,7 @@ export const AuthProvider = ({ children }) => {
     );
 
     // Register driver's device and platform
-    const syncDevice = async (driver, token) => {
+    const syncDevice = async (driver: any, token: any) => {
         try {
             await driver.syncDevice({ token, platform: Platform.OS });
         } catch (err) {
@@ -189,7 +194,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Register current state driver's device and platform
-    const registerDevice = async (token) => {
+    const registerDevice = async (token: any) => {
         try {
             await syncDevice(state.driver, token);
         } catch (err) {
@@ -199,7 +204,7 @@ export const AuthProvider = ({ children }) => {
 
     // Create Account: Send verification code
     const requestCreationCode = useCallback(
-        async (phone, method = 'sms') => {
+        async (phone: any, method = 'sms') => {
             dispatch({ type: 'CREATING_ACCOUNT', phone, isSendingCode: true });
             try {
                 await fleetbase.drivers.requestCreationCode(phone, method);
@@ -216,7 +221,7 @@ export const AuthProvider = ({ children }) => {
 
     // Create Account: Verify Code
     const verifyAccountCreation = useCallback(
-        async (phone, code, attributes = {}) => {
+        async (phone: any, code: any, attributes = {}) => {
             dispatch({ type: 'VERIFY', isVerifyingCode: true });
             try {
                 const driver = await fleetbase.drivers.create(phone, code, attributes);
@@ -232,13 +237,13 @@ export const AuthProvider = ({ children }) => {
         [fleetbase]
     );
 
-    // Login: Send verification code
+    // Login: Send verification code via Fleetbase SDK
     const login = useCallback(
-        async (phone) => {
+        async (phone: any) => {
             dispatch({ type: 'LOGIN', phone, isSendingCode: true });
             try {
-                const { method } = await fleetbase.drivers.login(phone);
-                dispatch({ type: 'LOGIN', phone, isSendingCode: false, loginMethod: method ?? 'sms' });
+                await fleetbase.drivers.login(phone);
+                dispatch({ type: 'LOGIN', phone, isSendingCode: false, loginMethod: 'sms' });
             } catch (error) {
                 dispatch({ type: 'LOGIN', phone, isSendingCode: false });
                 console.warn('[AuthContext] Login failed:', error);
@@ -258,9 +263,9 @@ export const AuthProvider = ({ children }) => {
         FacebookLoginManager.logOut();
     };
 
-    // Verify code
+    // Verify code via Fleetbase SDK
     const verifyCode = useCallback(
-        async (code) => {
+        async (code: any) => {
             dispatch({ type: 'VERIFY', isVerifyingCode: true });
             try {
                 const driver = await fleetbase.drivers.verifyCode(state.phone, code);
@@ -272,11 +277,11 @@ export const AuthProvider = ({ children }) => {
                 throw error;
             }
         },
-        [fleetbase, state.phone, setDriver]
+        [fleetbase, state.phone]
     );
 
     // Create a session from driver data/JSON
-    const createDriverSession = async (driver, callback = null) => {
+    const createDriverSession = async (driver: any, callback: any = null) => {
         clearSessionData();
         // setDriverDefaultLocation(driver);
         setDriver(driver);
@@ -294,7 +299,7 @@ export const AuthProvider = ({ children }) => {
         }
 
         organizationsLoadedRef.current = false;
-        loadOrganizationsPromiseRef.current = null;
+        loadOrganizationsPromiseRef.current = undefined;
 
         return instance;
     };
@@ -307,18 +312,18 @@ export const AuthProvider = ({ children }) => {
             loadOrganizationsPromiseRef.current = state.driver.listOrganizations();
             const organizations = await loadOrganizationsPromiseRef.current;
             console.log('[loadOrganizations #organizations]', organizations);
-            setOrganizations(organizations.map((n) => n.serialize()));
+            setOrganizations((organizations || []).map((n: any) => n.serialize()));
         } catch (err) {
             console.warn('Error trying to load driver organizations:', err);
         } finally {
             organizationsLoadedRef.current = true;
-            loadOrganizationsPromiseRef.current = null;
+            loadOrganizationsPromiseRef.current = undefined;
         }
     }, [state.driver]);
 
     // Load organizations driver belongs to
     const switchOrganization = useCallback(
-        async (organization) => {
+        async (organization: any) => {
             if (!adapter) return;
 
             try {
@@ -356,11 +361,11 @@ export const AuthProvider = ({ children }) => {
         clearSessionData();
 
         // Reset locale
-        setLocale(navigatorConfig('defaultLocale', 'en'));
+        setLocale((navigatorConfig as any)('defaultLocale', 'en') as string);
 
-        later(() => {
+        (later as any)(() => {
             dispatch({ type: 'LOGOUT', isSigningOut: false });
-        });
+        }, 100);
     }, [setDriver]);
 
     // // Sync device token if it changes
