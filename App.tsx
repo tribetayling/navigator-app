@@ -1,25 +1,30 @@
-import React from 'react';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { TamaguiProvider, Theme } from 'tamagui';
 import { Toasts } from '@backpackapp-io/react-native-toast';
-import { PortalProvider, PortalHost } from '@gorhom/portal';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { PortalHost, PortalProvider } from '@gorhom/portal';
+import React, { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { TamaguiProvider, Theme } from 'tamagui';
 import { AuthProvider } from './src/contexts/AuthContext';
-import { SocketClusterProvider } from './src/contexts/SocketClusterContext';
-import { OrderManagerProvider } from './src/contexts/OrderManagerContext';
-import { LanguageProvider } from './src/contexts/LanguageContext';
-import { TempStoreProvider } from './src/contexts/TempStoreContext';
-import AppNavigator from './src/navigation/AppNavigator';
-import { ThemeProvider, useThemeContext } from './src/contexts/ThemeContext';
-import { NotificationProvider } from './src/contexts/NotificationContext';
 import { ChatProvider } from './src/contexts/ChatContext';
-import { LocationProvider } from './src/contexts/LocationContext';
 import { ConfigProvider } from './src/contexts/ConfigContext';
+import { LanguageProvider } from './src/contexts/LanguageContext';
+import { LocationProvider } from './src/contexts/LocationContext';
+import { NotificationProvider } from './src/contexts/NotificationContext';
+import { OrderManagerProvider } from './src/contexts/OrderManagerContext';
+import { SocketClusterProvider } from './src/contexts/SocketClusterContext';
+import { TempStoreProvider } from './src/contexts/TempStoreContext';
+import { ThemeProvider, useThemeContext } from './src/contexts/ThemeContext';
+import AppNavigator from './src/navigation/AppNavigator';
+import { initializeCrashlytics } from './src/utils/crashlytics';
 import config from './tamagui.config';
 
 function AppContent(): React.JSX.Element {
     const { appTheme } = useThemeContext();
+
+    useEffect(() => {
+        initializeCrashlytics();
+    }, []);
 
     return (
         <TamaguiProvider config={config} theme={appTheme}>
