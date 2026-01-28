@@ -11003,6 +11003,11 @@ react-native-calendar-strip@^2.2.6:
     prop-types "^15.6.0"
     recyclerlistview "^3.0.0"
 
+react-native-clarity@^4.5.3:
+  version "4.5.3"
+  resolved "https://registry.yarnpkg.com/react-native-clarity/-/react-native-clarity-4.5.3.tgz#bc0f486511c2a2ad5854c1fa48a98e3a3da1534f"
+  integrity sha512-Z5HHMLkU/G/L4Ir3oa9oyjpIWennBmjuioeTj3b7lXAItFNy7vmlqZx/3hQK+ajufOSUi5TP6XxMt2/C1FkDag==
+
 react-native-collapsible@^1.6.2:
   version "1.6.2"
   resolved "https://registry.yarnpkg.com/react-native-collapsible/-/react-native-collapsible-1.6.2.tgz#3b67fa402a6ba3c291022f5db8f345083862c3d8"

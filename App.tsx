@@ -16,6 +16,7 @@ import { SocketClusterProvider } from './src/contexts/SocketClusterContext';
 import { TempStoreProvider } from './src/contexts/TempStoreContext';
 import { ThemeProvider, useThemeContext } from './src/contexts/ThemeContext';
 import AppNavigator from './src/navigation/AppNavigator';
+import { initializeClarity } from './src/utils/clarity';
 import { initializeCrashlytics } from './src/utils/crashlytics';
 import config from './tamagui.config';
 
@@ -24,6 +25,7 @@ function AppContent(): React.JSX.Element {
 
     useEffect(() => {
         initializeCrashlytics();
+        initializeClarity();
     }, []);
 
     return (
